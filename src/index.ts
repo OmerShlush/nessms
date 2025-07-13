@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
-import crypto from 'crypto';
 import cors from 'cors';
 import path from 'path';
 import { config } from './configurations/app.config';
