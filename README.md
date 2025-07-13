@@ -1,140 +1,148 @@
-Thanks for sharing your project structure! It looks solid, but to make it clean, production-ready, and GitHub-friendly, here's how you should **organize, clean up, and commit it** to GitHub.
+
+```markdown
+# NESSMS - Notification & SMS Service
+
+A full-stack TypeScript-based platform for centralized alert monitoring and notification handling. Built with Node.js, Express, and React (Vite), this service continuously fetches alerts, applies business logic, and notifies relevant users via SMS or other channels.
 
 ---
 
-### ✅ **Review of Your Structure**
+## Tech Stack
 
-You have:
+### Backend
+- Node.js + Express (TypeScript)
+- Log4JS for logging
+- dotenv for configuration
+- CORS and RBAC middleware
+
+### Frontend
+- React (Vite)
+- Built once and served statically from the backend
+
+---
+
+## Project Structure
 
 ```
+
 NESSMS/
-├── client/              # React frontend (Vite)
-│   ├── dist/            # ✅ build output (should be gitignored)
-│   ├── public/
-│   ├── src/
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-├── src/                 # Node backend source (TS)
-│   ├── configurations/
+├── client/               # React (frontend)
+│   ├── src/              # React source code
+│   ├── dist/             # Vite build output (served by Express)
+│   └── ...
+├── src/                  # Node backend
 │   ├── controllers/
-│   ├── db/
-│   ├── interfaces/
-│   ├── middleware/
 │   ├── services/
-│   ├── index.ts         # ✅ main entry
-├── database/            # ✅ custom folder (ok if used)
-├── logs/                # ✅ runtime only (should be gitignored)
-├── node_modules/        # ✅ ignored
-├── .env                 # ⚠️ sensitive (must be gitignored)
-├── .gitignore
-├── package.json         # Backend's package.json
-├── tsconfig.json
-├── start.bat            # Optional for dev env
-```
+│   ├── db/
+│   ├── configurations/
+│   └── ...
+├── .env                  # Environment config
+├── README.md             # You are here
+└── ...
+
+````
 
 ---
 
-### 📁 **Recommended `.gitignore` (root level)**
+## ⚙️ Environment Variables
 
-```gitignore
-# Node
-node_modules/
-logs/
-.env
-dist/
-*.log
-
-# React (client)
-client/node_modules/
-client/dist/
-client/.env
-
-# System/IDE
-.DS_Store
-.vscode/
-.idea/
-*.swp
-
-# TypeScript
-*.tsbuildinfo
-
-# Optional
-*.bak
-*.tmp
-```
-
----
-
-### ✅ **What to Commit to GitHub**
-
-| File/Folder           | Commit? | Notes                       |
-| --------------------- | ------- | --------------------------- |
-| `client/src/`         | ✅       | Your React app source code  |
-| `client/public/`      | ✅       | Public assets               |
-| `client/package.json` | ✅       | Needed to install/build     |
-| `client/dist/`        | ❌       | Built files, ignore them    |
-| `src/`                | ✅       | Backend code (Node.js + TS) |
-| `.env`                | ❌       | Add `.env.example` instead  |
-| `logs/`               | ❌       | Runtime only                |
-| `node_modules/`       | ❌       | Always ignore               |
-| `start.bat`           | ✅       | If helpful for others       |
-
----
-
-### ✅ **Add `.env.example`**
-
-Create a safe placeholder for collaborators:
+Create a `.env` file at the project root. Use `.env.example` as a reference:
 
 ```env
-PORT=3000
-SMS_API_URL=https://your-sms-endpoint
-SMS_API_KEY=your-api-key-here
-```
+PORT=80
+
+MSSQL_SERVER="SQLINSTANCE"
+MSSQL_DATABASE="SQLDB"
+MSSQL_USER="SQLUSER"
+MSSQL_PASSWORD="SQLPASS"
+
+LOG_LEVEL=INFO
+
+SMTP_HOST=localhost
+SMTP_PORT=25
+SMTP_EMAIL=example@example.com
+
+EVENTS_INTERVAL_MS=60000
+
+````
 
 ---
 
-### 📝 **README.md Outline (Suggestion)**
+## Getting Started
 
-````markdown
-# NESSMS
-
-A Node.js + React SMS notification system.
-
-## 📦 Stack
-
-- Node.js + Express + TypeScript
-- React + Vite
-- Log4JS for logging
-
-## 🚀 Setup
+### 1. Clone the repository
 
 ```bash
-# Backend
-cd NESSMS
-npm install
+git clone https://github.com/OmerShlush/nessms.git
+cd nessms
+```
 
-# Frontend
+### 2. Install backend dependencies
+
+```bash
+npm install
+```
+
+### 3. Build the frontend
+
+```bash
 cd client
 npm install
 npm run build
-````
+cd ..
+```
 
-## 🧪 Run
+> This will create a `client/dist` folder that Express will serve.
+
+### 4. Start the backend
 
 ```bash
-# Backend
-npm run dev  # or start.bat
+
+npm start
 ```
 
-## 🌍 Access
+---
 
-Once running, the backend serves the built React app:
+## API Endpoints
 
-```
-http://localhost:3000/
-```
+> All routes are under `/api/v1` and protected by role-based access
 
-## 🛠 Environment Variables
+| Endpoint             | Role Required | Description                       |
+| -------------------- | ------------- | --------------------------------- |
+| `/contact`           | admin, viewer | Manage contacts                   |
+| `/policy-group`      | admin, viewer | Access policy groups              |
+| `/maintenance-event` | admin, viewer | View maintenance windows          |
+| `/messages-log`      | admin, viewer | View SMS/email message logs       |
+| `/notification`      | admin         | Send notifications                |
+| `/account`           | public        | Account authentication and access |
 
-See `.env.example`
+---
+
+## Alert Engine (Background Poller)
+
+After startup:
+
+* Waits `EVENTS_INTERVAL_MS` (from `.env`)
+* Polls alert DB for:
+
+  * `newAlerts`
+  * `changedAlerts`
+  * `closedAlerts`
+* Applies filtering based on active maintenance
+* Handles and logs alerts accordingly
+* Will exit on 5 consecutive processing failures
+
+---
+
+## Security & Middleware
+
+* `authorizeRole()` middleware protects sensitive routes
+
+---
+
+## Developer Notes
+
+* React frontend is built once using `vite build`
+* Logs via `Log4JS` (`src/configurations/log4js.config.ts`)
+* Background polling logic inside `handleAlertsFunction()`
+* Routes defined in `src/controllers`
+
