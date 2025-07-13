@@ -1,0 +1,9 @@
+USE NESSMS;
+
+CREATE TABLE accounts (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(200) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL
+);
