@@ -1,7 +1,8 @@
 
-```markdown
+
 # NESSMS - Notification & SMS Service
 
+```
 A full-stack TypeScript-based platform for centralized alert monitoring and notification handling. Built with Node.js, Express, and React (Vite), this service continuously fetches alerts, applies business logic, and notifies relevant users via SMS or other channels.
 ```
 
